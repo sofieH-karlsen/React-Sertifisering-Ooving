@@ -5,6 +5,7 @@ import PackingList from './components/PackingList';
 import CountryList from './components/CountryList';
 import SelectList from './components/SelectList';
 import Counter from './components/Counter';
+import BigForm from './components/BigForm';
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
       ---------------------------------------
       <SelectList />
       ---------------------------------------
+      <BigForm />
     </div>
   )
 }
