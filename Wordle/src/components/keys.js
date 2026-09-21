@@ -3,7 +3,7 @@ const keys = [
     {key:'g'},{key:'h'},{key:'i'},{key:'j'},{key:'k'},{key:'l'},
     {key:'m'},{key:'n'},{key:'o'},{key:'p'},{key:'q'},{key:'r'},
     {key:'s'},{key:'t'},{key:'u'},{key:'v'},{key:'w'},{key:'x'},
-    {key:'y'},{key:'z'}
+    {key:'y'},{key:'z'},{key:'æ'},{key:'ø'},{key:'å'},
 ];
 
 export default keys;
