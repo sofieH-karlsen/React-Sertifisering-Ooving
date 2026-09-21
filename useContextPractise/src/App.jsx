@@ -6,27 +6,62 @@ import CountryList from './components/CountryList';
 import SelectList from './components/SelectList';
 import Counter from './components/Counter';
 import BigForm from './components/BigForm';
+import { useState } from 'react';
+import PokemonAPI from './components/PokemonAPI';
+
+const AppView = {
+  Cart: 'Cart',
+  PackingList: 'PackingList',
+  CurrencyConverter: 'CurrencyConverter',
+  SelectList: 'SelectList',
+  CountryList: 'CountryList',
+  Counter: 'Counter',
+  BigForm: 'BigForm',
+  Pokemon: 'Pokemon'
+};
 
 function App() {
+  const [app,setApp] = useState(AppView.Cart);
 
   return (
-    <div>
-      <CartHandler>
-        <Cart />
-      </CartHandler>
-      ---------------------------------------
-      <PackingList />
-      -------------------------------------
-      <CurrencyConverter/>
-      ---------------------------------------
-      <CountryList />
-      ---------------------------------------
-      <Counter />
-      ---------------------------------------
-      <SelectList />
-      ---------------------------------------
-      <BigForm />
-    </div>
+    <>
+      <label htmlFor="appSelect">
+        Select your option: 
+        <select id="appSelect" name="appSelect" value={app} onChange={e=>setApp(e.target.value)}>
+          {Object.values(AppView).map(view => (
+            <option key={view} value={view}>{view}</option>
+          ))}
+        </select>
+      </label>
+
+      {(() => {
+        switch (app) {
+          case AppView.Cart:
+            return (
+              <CartHandler>
+                <Cart />
+              </CartHandler>
+            );  
+          case AppView.PackingList:
+            return <PackingList />;
+          case AppView.CurrencyConverter:
+            return <CurrencyConverter />;
+          case AppView.SelectList:
+            return <SelectList />;
+          case AppView.CountryList:
+            return <CountryList />;
+          case AppView.Counter:
+            return <Counter />;
+          case AppView.BigForm:
+            return <BigForm />;
+          case AppView.Pokemon:
+            return <PokemonAPI />;
+          default:
+            return null;
+        }
+      })()}
+    </>
+   
   )
 }
 
