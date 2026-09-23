@@ -43,18 +43,7 @@ function AddItem({ setItems, items }){
 
 function ItemsList({ items, setItems, togglePacked }){
     return (
-        <ul
-            style={{
-                listStyle: "none",
-                padding: "1rem",
-                margin: 0,
-                width: "200px",
-                height: "200px",
-                overflowY: "auto",
-                border: "1px solid #ccc",
-                borderRadius: "8px",
-            }}
-        >
+        <ul>
             {items.map(item => (
                 <li  key={item.id}>
                    <input type="checkbox" checked={item.packed} onChange={() => {togglePacked(item.id)}} />
