@@ -1,18 +1,58 @@
 import { useState, useEffect } from 'react';
 
-async function getPokemonList(limit = 10000, offset = 0) {
-  const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`);
-  const data = await res.json();
+async function getJson(url) {
+    const res = await fetch(url);
+    return res.json();
+}
 
-  return data.results.map(p => {
-    const id = p.url.split('/').filter(Boolean).pop();
+async function getPokemonList(limit = 151, offset = 0) {
+    const data = await getJson(
+        `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`
+    );
+
+    return data.results.map(p => {
+        const id = p.url.split('/').filter(Boolean).pop();
+        return {
+            id: Number(id),
+            name: p.name,
+            image: null,
+            types: [],
+            forms: []
+        };
+    });
+}
+
+async function getPokemonWithForms(pokemon) {
+    // Base Pokémon data (types, sprite)
+    const data = await getJson(`https://pokeapi.co/api/v2/pokemon/${pokemon.id}`);
+
+    // Species data lists every variety (base + alternate forms)
+    const species = await getJson(data.species.url);
+
+    const formUrls = species.varieties
+        .filter(v => !v.is_default) // skip the base Pokémon itself
+        .map(v => v.pokemon.url);
+
+    const forms = (
+        await Promise.all(
+            formUrls.map(async url => {
+                const f = await getJson(url);
+                return {
+                    id: f.id,
+                    name: f.name,
+                    image: f.sprites.front_default,
+                    types: f.types
+                };
+            })
+        )
+    ).filter(f => f.image); // drop forms without a sprite
+
     return {
-      id: Number(id),
-      name: p.name,
-      image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
-      types: []
+        ...pokemon,
+        image: data.sprites.front_default,
+        types: data.types,
+        forms
     };
-  });
 }
 
 export default function PokemonAPI() {
@@ -22,20 +62,16 @@ export default function PokemonAPI() {
     const [typeSearch, setTypeSearch] = useState('');
 
     useEffect(() => {
-        getPokemonList().then(list => {
-            // Fetch types for each Pokemon
-            Promise.all(list.map(async pokemon => {
-                const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.id}`);
-                const data = await res.json();
-                return {
-                    ...pokemon,
-                    types: data.types
-                };
-            })).then(fullList => {
-                setPokemonList(fullList);
+        getPokemonList()
+            .then(list => Promise.all(list.map(getPokemonWithForms)))
+            .then(fullList => {
+                setPokemonList(fullList.filter(p => p.image)); // hide those without an image
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error(err);
                 setLoading(false);
             });
-        });
     }, []);
 
     if (loading) {
@@ -46,10 +82,16 @@ export default function PokemonAPI() {
     const typeQ = typeSearch.trim().toLowerCase();
 
     const filteredList = pokemonList.filter(pokemon => {
-        const nameMatch = !nameQ || pokemon.name.toLowerCase().includes(nameQ);
-        const typeMatch = !typeQ || pokemon.types?.some(t =>
-            t.type.name.toLowerCase().includes(typeQ)
-        );
+        const all = [pokemon, ...pokemon.forms];
+
+        const nameMatch =
+            !nameQ || all.some(p => p.name.toLowerCase().includes(nameQ));
+
+        const typeMatch =
+            !typeQ ||
+            all.some(p =>
+                p.types?.some(t => t.type.name.toLowerCase().includes(typeQ))
+            );
 
         return nameMatch && typeMatch;
     });
@@ -83,16 +125,40 @@ export default function PokemonAPI() {
                 />
             </div>
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(10, 1fr)',
-            }}>
+            <div
+                style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(6, 1fr)',
+                }}
+            >
                 {filteredList.map(pokemon => (
-                    <div key={pokemon.id}>
-                        <img src={pokemon.image} alt={pokemon.name} width={96} height={96} />
+                    <div key={pokemon.id} style={{ border: '1px solid #ccc', padding: '8px', margin: '4px' }}>
+                        <img
+                            src={pokemon.image}
+                            alt={pokemon.name}
+                            width={100}
+                            height={100}
+                        />
                         <div>{pokemon.name}</div>
                         <div>ID: {pokemon.id}</div>
-                        <div>Types: {pokemon.types?.map(t => t.type.name).join(', ')}</div>
+                        <div>
+                            Types: {pokemon.types?.map(t => t.type.name).join(', ')}
+                        </div>
+
+                        {pokemon.forms.length > 0 && (
+                            <div>
+                                {pokemon.forms.map(form => (
+                                    <img
+                                        key={form.id}
+                                        src={form.image}
+                                        alt={form.name}
+                                        title={form.name}
+                                        width={70}
+                                        height={70}
+                                    />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
