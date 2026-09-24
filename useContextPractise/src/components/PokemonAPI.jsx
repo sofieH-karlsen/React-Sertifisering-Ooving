@@ -5,7 +5,7 @@ async function getJson(url) {
     return res.json();
 }
 
-async function getPokemonList(limit = 151, offset = 0) {
+async function getPokemonList(limit = 1025, offset = 0) {
     const data = await getJson(
         `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`
     );
@@ -60,6 +60,7 @@ export default function PokemonAPI() {
     const [loading, setLoading] = useState(true);
     const [nameSearch, setNameSearch] = useState('');
     const [typeSearch, setTypeSearch] = useState('');
+    const [visibleForms, setVisibleForms] = useState({});
 
     useEffect(() => {
         getPokemonList()
@@ -145,18 +146,35 @@ export default function PokemonAPI() {
                             Types: {pokemon.types?.map(t => t.type.name).join(', ')}
                         </div>
 
+                        
+
                         {pokemon.forms.length > 0 && (
                             <div>
-                                {pokemon.forms.map(form => (
-                                    <img
-                                        key={form.id}
-                                        src={form.image}
-                                        alt={form.name}
-                                        title={form.name}
-                                        width={70}
-                                        height={70}
-                                    />
-                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setVisibleForms(current => ({
+                                            ...current,
+                                            [pokemon.id]: !current[pokemon.id]
+                                        }))
+                                    }
+                                >
+                                    {visibleForms[pokemon.id]
+                                        ? 'Hide forms'
+                                        : 'Show forms'}
+                                </button><br/>
+
+                                {visibleForms[pokemon.id] &&
+                                    pokemon.forms.map(form => (
+                                        <img
+                                            key={form.id}
+                                            src={form.image}
+                                            alt={form.name}
+                                            title={form.name}
+                                            width={70}
+                                            height={70}
+                                        />
+                                    ))}
                             </div>
                         )}
                     </div>
