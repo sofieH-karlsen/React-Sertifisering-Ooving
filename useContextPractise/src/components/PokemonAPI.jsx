@@ -129,7 +129,7 @@ export default function PokemonAPI() {
             <div
                 style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(6, 1fr)',
+                    gridTemplateColumns: 'repeat(4, 1fr)',
                 }}
             >
                 {filteredList.map(pokemon => (
@@ -137,8 +137,8 @@ export default function PokemonAPI() {
                         <img
                             src={pokemon.image}
                             alt={pokemon.name}
-                            width={100}
-                            height={100}
+                            width="50%"
+                            //height="50%"
                         />
                         <div>{pokemon.name}</div>
                         <div>ID: {pokemon.id}</div>
@@ -171,8 +171,8 @@ export default function PokemonAPI() {
                                             src={form.image}
                                             alt={form.name}
                                             title={form.name}
-                                            width={70}
-                                            height={70}
+                                            width='30%'
+                                            //height={70}
                                         />
                                     ))}
                             </div>
