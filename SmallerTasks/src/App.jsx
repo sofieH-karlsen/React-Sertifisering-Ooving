@@ -1,4 +1,5 @@
 import Cart from './components/Cart'
+import Cats from './components/Cats'
 import { CartHandler } from './components/CartHandler';
 import CurrencyConverter from './components/CurrencyConverter';
 import PackingList from './components/PackingList';
@@ -17,7 +18,8 @@ const AppView = {
   CountryList: 'CountryList',
   Counter: 'Counter',
   BigForm: 'BigForm',
-  Pokemon: 'Pokemon'
+  Pokemon: 'Pokemon',
+  Cats: 'Cats'
 };
 
 function App() {
@@ -56,6 +58,8 @@ function App() {
             return <BigForm />;
           case AppView.Pokemon:
             return <PokemonAPI />;
+          case AppView.Cats:
+            return <Cats />;
           default:
             return null;
         }
